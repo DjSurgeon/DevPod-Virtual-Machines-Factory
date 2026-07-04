@@ -112,8 +112,8 @@ elif [ "$PROJECT_TYPE" = "inception" ]; then
         rm -rf "/home/${REMOTE_ADMIN_USER}/inception"
 
         # 4. Console Web Browser (Links2 + Framebuffer)
-        echo "⏳ Waiting for apt locks to clear..."
-        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        echo "⏳ Waiting for cloud-init to finish background setup..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S cloud-init status --wait >/dev/null 2>&1 || true
         
         echo "🌐 Installing Links2 (Framebuffer Browser) and GPM (Mouse Support)..."
         echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
