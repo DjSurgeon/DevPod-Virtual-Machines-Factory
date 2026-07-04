@@ -111,6 +111,26 @@ elif [ "$PROJECT_TYPE" = "inception" ]; then
         # 3. Environment cleanup
         rm -rf "/home/${REMOTE_ADMIN_USER}/inception"
 
+        # 4. Console Web Browser (Links2 + Framebuffer)
+        echo "⏳ Waiting for apt locks to clear..."
+        while echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
+        
+        echo "🌐 Installing Links2 (Framebuffer Browser) and GPM (Mouse Support)..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get update -qq
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S DEBIAN_FRONTEND=noninteractive apt-get install -y links2 gpm
+        
+        echo "🐁 Configuring GPM service..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S systemctl enable gpm >/dev/null 2>&1 || true
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S systemctl start gpm >/dev/null 2>&1 || true
+
+        echo "🔐 Configuring Video permissions for Links2..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S chown root:video /usr/bin/links2
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S chmod g+s /usr/bin/links2
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S usermod -aG video "${REMOTE_ADMIN_USER}"
+
+        echo "🔧 Adding 'browser' alias to .bashrc..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "${REMOTE_ADMIN_USER}" bash -c 'echo "alias browser=\"links2 -g -driver fb\"" >> ~/.bashrc'
+
         echo "===================================================="
         echo "  VM ready! SSH into the machine, clone your repo in your HOME, and run make"
         echo "===================================================="
