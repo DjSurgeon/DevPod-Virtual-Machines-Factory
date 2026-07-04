@@ -162,6 +162,19 @@ Section "InputClass"
 EndSection
 EOF_KBD'
 
+        echo "🔧 Disabling default XDG user directories (Desktop, Downloads, etc.)..."
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" mkdir -p /home/${REMOTE_ADMIN_USER}/.config
+        echo "${REMOTE_ADMIN_PASSWORD}" | sudo -S -u "$REMOTE_ADMIN_USER" bash -c 'cat << "EOF_XDG" > /home/'${REMOTE_ADMIN_USER}'/.config/user-dirs.dirs
+XDG_DESKTOP_DIR="$HOME"
+XDG_DOWNLOAD_DIR="$HOME"
+XDG_TEMPLATES_DIR="$HOME"
+XDG_PUBLICSHARE_DIR="$HOME"
+XDG_DOCUMENTS_DIR="$HOME"
+XDG_MUSIC_DIR="$HOME"
+XDG_PICTURES_DIR="$HOME"
+XDG_VIDEOS_DIR="$HOME"
+EOF_XDG'
+
         echo "===================================================="
         echo "  VM ready! SSH into the machine, clone your repo, and run 'startx' to launch GUI"
         echo "===================================================="
